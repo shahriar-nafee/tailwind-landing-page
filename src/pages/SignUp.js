@@ -20,7 +20,7 @@ function SignUp() {
                   Welcome. We exist to make entrepreneurism easier.
                 </h1>
               </div>
-
+              <h1>testing</h1>
               {/* Form */}
               <div className="max-w-sm mx-auto">
                 <form>
