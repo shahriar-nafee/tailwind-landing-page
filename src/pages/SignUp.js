@@ -1,9 +1,34 @@
-import React from "react";
-import { Link } from "react-router-dom";
-
+import React, { useRef, useState } from "react";
+import { Link, useHistory } from "react-router-dom";
 import Header from "../partials/Header";
+import { useAuth } from "../contexts/AuthContext";
 
 function SignUp() {
+  const emailRef = useRef();
+  const passwordRef = useRef();
+  const confirmPasswordRef = useRef();
+  const [error, setError] = useState();
+  const [loading, setLoading] = useState(false);
+  const { signup } = useAuth();
+  const history = useHistory();
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (passwordRef.current.value !== confirmPasswordRef.current.value) {
+      return setError("Passwords do not match");
+    }
+
+    try {
+      setError("");
+      setLoading(true);
+      await signup(emailRef.current.value, passwordRef.current.value);
+      history.push("/");
+    } catch {
+      setError("Failed to create an account");
+    }
+    setLoading(false);
+  }
+
   return (
     <div className="flex flex-col min-h-screen overflow-hidden">
       {/*  Site header */}
@@ -23,8 +48,9 @@ function SignUp() {
               <h1>testing</h1>
               {/* Form */}
               <div className="max-w-sm mx-auto">
-                <form>
-                  <div className="flex flex-wrap -mx-3 mb-4">
+                {error && console.log(`error`, error)}
+                <form onSubmit={handleSubmit}>
+                  {/* <div className="flex flex-wrap -mx-3 mb-4">
                     <div className="w-full px-3">
                       <label
                         className="block text-gray-800 text-sm font-medium mb-1"
@@ -91,7 +117,7 @@ function SignUp() {
                         required
                       />
                     </div>
-                  </div>
+                  </div> */}
                   <div className="flex flex-wrap -mx-3 mb-4">
                     <div className="w-full px-3">
                       <label
@@ -105,6 +131,7 @@ function SignUp() {
                         type="email"
                         className="form-input w-full text-gray-800"
                         placeholder="Enter your email address"
+                        ref={emailRef}
                         required
                       />
                     </div>
@@ -122,13 +149,35 @@ function SignUp() {
                         type="password"
                         className="form-input w-full text-gray-800"
                         placeholder="Enter your password"
+                        ref={passwordRef}
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap -mx-3 mb-4">
+                    <div className="w-full px-3">
+                      <label
+                        className="block text-gray-800 text-sm font-medium mb-1"
+                        htmlFor="password"
+                      >
+                        Confirm Password <span className="text-red-600">*</span>
+                      </label>
+                      <input
+                        id="password"
+                        type="password"
+                        className="form-input w-full text-gray-800"
+                        placeholder="Enter your password"
+                        ref={confirmPasswordRef}
                         required
                       />
                     </div>
                   </div>
                   <div className="flex flex-wrap -mx-3 mt-6">
                     <div className="w-full px-3">
-                      <button className="btn text-white bg-blue-600 hover:bg-blue-700 w-full">
+                      <button
+                        disabled={loading}
+                        className="btn text-white bg-blue-600 hover:bg-blue-700 w-full"
+                      >
                         Sign up
                       </button>
                     </div>
